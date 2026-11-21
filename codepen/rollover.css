@@ -1,0 +1,30 @@
+/* Calculadora de rollover. Pegá este bloque en el panel CSS. */
+:root{--bg:#101215;--card:#181b20;--card2:#20242b;--campo:#0d0f12;--line:#2e333c;--ink:#f0f2f5;--body:#cdd2da;--muted:#9da4b0;--acc:#9ec1ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+a{color:var(--acc);text-underline-offset:3px}
+a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px 40px}
+.calc{padding:20px 16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+h1{margin:0 0 6px;color:var(--ink);font-size:24px;line-height:1.2}
+.sub{margin:0 0 16px;color:var(--muted);font-size:15px}
+.campos{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f>span{font-size:14px;font-weight:600}
+input[type=text],select{width:100%;height:46px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--campo);color:var(--ink);font:inherit}
+input[type=text]::placeholder{color:#7d8592}
+.out{margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--card2)}
+.res{margin:0;padding:0;list-style:none}
+.res li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;padding:10px 0;border-bottom:1px solid var(--line)}
+.res li:first-child{padding-top:0}
+.res span{color:var(--muted);font-size:14px}
+.res output{margin-left:auto;color:var(--ink);font-size:18px;font-weight:700;text-align:right}
+.v{margin:14px 0 0;color:var(--ink)}
+.nota{margin:16px 0 0;color:var(--muted);font-size:14px}
+footer{margin-top:20px;color:var(--muted);font-size:14px}
+footer p{margin:0 0 8px;overflow-wrap:anywhere}
+@media (min-width:520px){
+  .calc{padding:24px}
+  .campos{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .campos .ancho{grid-column:1/-1}
+}

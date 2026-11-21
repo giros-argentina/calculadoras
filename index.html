@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadoras de rollover, saldo y cuotas</title>
+<meta name="description" content="Tres calculadoras en JavaScript sin dependencias. Rollover de un bono, cuánto dura un saldo según el RTP y cuota combinada con pago posible.">
+<meta name="color-scheme" content="dark">
+<style>
+:root{--bg:#101215;--card:#181b20;--card2:#20242b;--campo:#0d0f12;--line:#2e333c;--ink:#f0f2f5;--body:#cdd2da;--muted:#9da4b0;--acc:#9ec1ff;--bad:#ff9a8f}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+a{color:var(--acc);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 40px}
+h1{margin:0 0 8px;color:var(--ink);font-size:26px;line-height:1.2;letter-spacing:-.01em}
+.lead{margin:0 0 16px;max-width:64ch}
+.ir{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:0;list-style:none}
+.ir a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);text-decoration:none;font-weight:600;font-size:15px}
+.calc{margin:0 0 20px;padding:20px 16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.calc h2{margin:0 0 4px;color:var(--ink);font-size:20px;line-height:1.25}
+.calc .sub{margin:0 0 16px;color:var(--muted);font-size:15px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.campos{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f>span,.f>label{color:var(--body);font-size:14px;font-weight:600}
+input[type=text],select{width:100%;height:46px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--campo);color:var(--ink);font:inherit}
+input[type=text]::placeholder{color:#7d8592}
+input[aria-invalid=true]{border-color:var(--bad)}
+fieldset{margin:0 0 12px;padding:0;border:0;min-width:0}
+legend{padding:0;margin:0 0 6px;color:var(--body);font-size:14px;font-weight:600}
+.fmt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:440px;border:1px solid var(--line);border-radius:10px;background:var(--campo);overflow:hidden}
+.fmt label{position:relative;display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 6px;border-left:1px solid var(--line);color:var(--body);font-size:15px;cursor:pointer}
+.fmt label:first-child{border-left:0}
+.fmt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.fmt label:has(input:checked){background:var(--card2);color:var(--ink);font-weight:700;box-shadow:inset 0 -3px 0 var(--acc)}
+.fmt label:has(input:focus-visible){outline:2px solid var(--acc);outline-offset:-3px}
+.sels{display:grid;gap:10px;margin:12px 0}
+.sel{display:grid;grid-template-columns:minmax(0,1fr) 100px 46px;gap:8px;align-items:end}
+.sel[hidden]{display:none}
+.sel output{display:flex;align-items:center;height:46px;padding:0 10px;border:1px dashed var(--line);border-radius:10px;color:var(--ink);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button{font:inherit;cursor:pointer}
+.x{width:46px;height:46px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--ink);font-size:20px;line-height:1}
+.add{min-height:46px;padding:0 16px;border:1px solid var(--line);border-radius:10px;background:var(--card2);color:var(--ink);font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+.out{padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--card2);align-self:start}
+.res{margin:0;padding:0;list-style:none}
+.res li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;padding:10px 0;border-bottom:1px solid var(--line)}
+.res li:first-child{padding-top:0}
+.res span{color:var(--muted);font-size:14px}
+.res output{color:var(--ink);font-size:18px;font-weight:700;text-align:right;margin-left:auto}
+.v{margin:14px 0 0;color:var(--ink)}
+.nota{margin:16px 0 0;color:var(--muted);font-size:14px}
+.nota a,footer a{display:inline-block;padding:4px 0;overflow-wrap:anywhere}
+footer{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+footer p{margin:0 0 8px;overflow-wrap:anywhere}
+@media (min-width:520px){
+  .wrap{padding:32px 24px 48px}
+  h1{font-size:32px}
+  .calc{padding:24px}
+  .campos{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .campos .ancho{grid-column:1/-1}
+  .sel{grid-template-columns:minmax(0,1fr) 120px 46px}
+}
+@media (min-width:900px){
+  .cols{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Calculadoras de rollover, saldo y cuotas</h1>
+  <p class="lead">Tres cuentas que se actualizan mientras escribís. Los números van como en Argentina, con punto de miles y coma decimal.</p>
+</header>
+<nav aria-label="Calculadoras">
+  <ul class="ir">
+    <li><a href="#rollover">Rollover</a></li>
+    <li><a href="#saldo">Saldo</a></li>
+    <li><a href="#cuotas">Cuotas</a></li>
+  </ul>
+</nav>
+<main>
+
+<section class="calc" id="rollover" aria-labelledby="t-rollover">
+  <h2 id="t-rollover">Rollover de un bono</h2>
+  <p class="sub">Cargá el depósito y los términos del bono para ver cuánto hay que apostar.</p>
+  <div class="cols">
+    <div class="campos">
+      <label class="f"><span>Depósito (ARS)</span><input type="text" id="r-dep" inputmode="numeric" autocomplete="off" value="20.000"></label>
+      <label class="f"><span>Bono (%)</span><input type="text" id="r-pct" inputmode="decimal" autocomplete="off" value="100"></label>
+      <label class="f"><span>Tope del bono (ARS, opcional)</span><input type="text" id="r-tope" inputmode="numeric" autocomplete="off" placeholder="sin tope"></label>
+      <label class="f"><span>Rollover (veces)</span><input type="text" id="r-roll" inputmode="decimal" autocomplete="off" value="35"></label>
+      <label class="f ancho"><span>Se calcula sobre</span>
+        <select id="r-base">
+          <option value="bono">Solo el bono</option>
+          <option value="suma">Depósito + bono</option>
+          <option value="deposito">Solo el depósito</option>
+        </select>
+      </label>
+      <label class="f"><span>Apuesta promedio (ARS, opcional)</span><input type="text" id="r-ap" inputmode="numeric" autocomplete="off" placeholder="por giro"></label>
+      <label class="f"><span>Plazo (días, opcional)</span><input type="text" id="r-dias" inputmode="decimal" autocomplete="off" placeholder="sin plazo"></label>
+    </div>
+    <div class="out" aria-live="polite">
+      <ul class="res">
+        <li><span>Bono acreditado</span><output id="r-o-bono" for="r-dep r-pct r-tope"></output></li>
+        <li><span>Total a apostar</span><output id="r-o-total" for="r-dep r-pct r-tope r-roll r-base"></output></li>
+        <li><span>Giros a la apuesta promedio</span><output id="r-o-giros" for="r-ap"></output></li>
+      </ul>
+      <p class="v" id="r-v"></p>
+    </div>
+  </div>
+  <p class="nota">+18 · Los términos de cada bono cambian. Leé los del operador antes de depositar. Guía y ejemplos en <a href="https://girosargentina.com/herramientas/calculadora-de-rollover/">girosargentina.com/herramientas/calculadora-de-rollover/</a></p>
+</section>
+
+<section class="calc" id="saldo" aria-labelledby="t-saldo">
+  <h2 id="t-saldo">Cuánto dura tu saldo</h2>
+  <p class="sub">Cargá el saldo, la apuesta por giro, el RTP del juego y tu ritmo.</p>
+  <div class="cols">
+    <div class="campos">
+      <label class="f"><span>Saldo (ARS)</span><input type="text" id="s-saldo" inputmode="decimal" autocomplete="off" value="20.000"></label>
+      <label class="f"><span>Apuesta por giro (ARS)</span><input type="text" id="s-ap" inputmode="decimal" autocomplete="off" value="200"></label>
+      <label class="f"><span>RTP del juego (%)</span><input type="text" id="s-rtp" inputmode="decimal" autocomplete="off" value="96"></label>
+      <label class="f"><span>Giros por minuto</span><input type="text" id="s-gpm" inputmode="decimal" autocomplete="off" value="10"></label>
+    </div>
+    <div class="out" aria-live="polite">
+      <ul class="res">
+        <li><span>Pérdida esperada por giro</span><output id="s-o-perd" for="s-ap s-rtp"></output></li>
+        <li><span>Giros esperados</span><output id="s-o-giros" for="s-saldo s-ap s-rtp"></output></li>
+        <li><span>Tiempo promedio</span><output id="s-o-tiempo" for="s-saldo s-ap s-rtp s-gpm"></output></li>
+      </ul>
+      <p class="v" id="s-v"></p>
+    </div>
+  </div>
+  <p class="nota">+18 · Es un promedio matemático. En una sesión real el saldo sube y baja, y puede durar mucho menos o mucho más. El RTP no asegura ningún resultado. Guía y ejemplos en <a href="https://girosargentina.com/herramientas/cuanto-dura-tu-saldo/">girosargentina.com/herramientas/cuanto-dura-tu-saldo/</a></p>
+</section>
+
+<section class="calc" id="cuotas" aria-labelledby="t-cuotas">
+  <h2 id="t-cuotas">Cuota combinada, pago y probabilidad</h2>
+  <p class="sub">Cargá el monto y la cuota de cada selección, hasta 8.</p>
+  <div class="cols">
+    <div>
+      <fieldset>
+        <legend>Formato de las cuotas</legend>
+        <div class="fmt">
+          <label><input type="radio" name="c-fmt" value="dec" autocomplete="off" checked><span>Decimal</span></label>
+          <label><input type="radio" name="c-fmt" value="fra" autocomplete="off"><span>Fraccionaria</span></label>
+          <label><input type="radio" name="c-fmt" value="ame" autocomplete="off"><span>Americana</span></label>
+        </div>
+      </fieldset>
+      <label class="f"><span>Monto de la apuesta (ARS)</span><input type="text" id="c-monto" inputmode="decimal" autocomplete="off" value="20.000"></label>
+      <div class="sels" id="c-sels"></div>
+      <button type="button" class="add" id="c-add">Agregar selección</button>
+    </div>
+    <div class="out" aria-live="polite">
+      <ul class="res">
+        <li><span>Cuota combinada</span><output id="c-o-comb"></output></li>
+        <li><span>Pago posible</span><output id="c-o-pago"></output></li>
+        <li><span>Ganancia neta</span><output id="c-o-neta"></output></li>
+        <li><span>Probabilidad implícita</span><output id="c-o-prob"></output></li>
+      </ul>
+      <p class="v" id="c-v"></p>
+    </div>
+  </div>
+  <p class="nota">+18 · La probabilidad implícita es 1 / cuota, lo que la cuota supone y no un pronóstico. El pago es posible, no seguro. Guía y ejemplos en <a href="https://girosargentina.com/herramientas/calculadora-de-cuotas/">girosargentina.com/herramientas/calculadora-de-cuotas/</a></p>
+</section>
+
+</main>
+<footer>
+  <p>Hecho por <a href="https://girosargentina.com/">Giros Argentina</a>. Código abierto con licencia MIT.</p>
+  <p>Jugá solo si sos mayor de 18 años. Línea de ayuda 0800 de tu provincia en <a href="https://girosargentina.com/juego-responsable/">girosargentina.com/juego-responsable/</a></p>
+</footer>
+</div>
+
+<script type="module">
+import { AR } from './src/numeros.js';
+import { leerNumero, miles, textoRollover } from './src/rollover.js';
+import { textoSaldo } from './src/saldo.js';
+import { MAX_SELECCIONES, leerCuota, cuotaTexto, textoCuotas } from './src/cuotas.js';
+
+const $ = (id) => document.getElementById(id);
+const escribe = (el, s) => { if (el.textContent !== s) el.textContent = s; };
+const marca = (el, mal) => { if (mal) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid'); };
+
+/* ---- rollover ---- */
+{
+  const campos = ['r-dep', 'r-pct', 'r-tope', 'r-roll', 'r-ap', 'r-dias'].map($), base = $('r-base');
+  const [dep, pct, tope, roll, ap, dias] = campos;
+  const calc = () => {
+    const t = textoRollover({
+      deposito: leerNumero(dep.value), porcentaje: leerNumero(pct.value), tope: leerNumero(tope.value),
+      rollover: leerNumero(roll.value), base: base.value, apuesta: leerNumero(ap.value), dias: leerNumero(dias.value)
+    });
+    escribe($('r-o-bono'), t.bono); escribe($('r-o-total'), t.total); escribe($('r-o-giros'), t.giros); escribe($('r-v'), t.veredicto);
+  };
+  for (const el of campos) {
+    el.addEventListener('input', calc);
+    el.addEventListener('blur', () => { // los montos quedan con punto de miles al salir del campo
+      const n = leerNumero(el.value);
+      if (n > 0 && el.getAttribute('inputmode') === 'numeric') el.value = miles(n);
+    });
+  }
+  base.addEventListener('change', calc);
+  calc();
+}
+
+/* ---- saldo ---- */
+{
+  const s = $('s-saldo'), ap = $('s-ap'), rtp = $('s-rtp'), gpm = $('s-gpm');
+  const calc = () => {
+    const S = AR.leer(s.value, 'mon'), A = AR.leer(ap.value, 'mon'), R = AR.leer(rtp.value.replace(/%/g, ''), 'dec'), G = AR.leer(gpm.value, 'dec');
+    const okM = (n) => n > 0 && n <= 1e12;
+    marca(s, S !== null && !okM(S)); marca(ap, A !== null && !okM(A));
+    marca(rtp, R !== null && !(R >= 0 && R < 100)); marca(gpm, G !== null && !(G > 0 && G <= 1000));
+    const t = textoSaldo({ saldo: S, apuesta: A, rtp: R, girosPorMinuto: G });
+    escribe($('s-o-perd'), t.perdida); escribe($('s-o-giros'), t.giros); escribe($('s-o-tiempo'), t.tiempo); escribe($('s-v'), t.veredicto);
+  };
+  for (const el of [s, ap, rtp, gpm]) el.addEventListener('input', calc);
+  for (const el of [s, ap]) {
+    el.addEventListener('blur', () => { const n = AR.leer(el.value, 'mon'); if (n > 0 && n <= 1e12) el.value = AR.monto(n); });
+  }
+  calc();
+}
+
+/* ---- cuotas ---- */
+{
+  const EJEMPLO = { dec: AR.fmt(1.85, 2, 2), fra: '5/2', ame: '+150' };
+  const INICIO = ['1,80', '2,10'];
+  const cont = $('c-sels'), monto = $('c-monto'), add = $('c-add'), radios = document.querySelectorAll('input[name="c-fmt"]');
+  const filas = [], val = [];
+  let formato = 'dec';
+
+  for (let i = 0; i < MAX_SELECCIONES; i++) {
+    const fila = document.createElement('div'); fila.className = 'sel'; fila.hidden = i >= INICIO.length;
+    const f = document.createElement('div'); f.className = 'f';
+    const lab = document.createElement('label'); lab.htmlFor = 'c-q' + (i + 1); lab.textContent = 'Selección ' + (i + 1);
+    const inp = document.createElement('input'); inp.type = 'text'; inp.id = 'c-q' + (i + 1); inp.autocomplete = 'off';
+    inp.setAttribute('inputmode', 'decimal'); inp.placeholder = EJEMPLO.dec; inp.value = INICIO[i] || '';
+    f.append(lab, inp);
+    const g = document.createElement('div'); g.className = 'f';
+    const rot = document.createElement('span'); rot.textContent = 'Probabilidad';
+    const out = document.createElement('output'); out.id = 'c-p' + (i + 1); out.htmlFor = inp.id;
+    out.setAttribute('aria-label', 'Probabilidad implícita de la selección ' + (i + 1));
+    g.append(rot, out);
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.textContent = '×';
+    x.setAttribute('aria-label', 'Quitar la selección ' + (i + 1));
+    fila.append(f, g, x); cont.append(fila);
+    filas.push({ fila, inp, out, x }); val.push(leerCuota(inp.value, formato));
+    inp.addEventListener('input', () => { val[i] = leerCuota(inp.value, formato); pintar(); });
+    inp.addEventListener('blur', () => { // deja la cuota en limpio solo si el texto limpio vale lo mismo
+      const v = val[i];
+      if (!(v > 1)) return;
+      const t = cuotaTexto(v, formato, true), w = leerCuota(t, formato);
+      if (Math.abs(w - v) <= 1e-9 * v) inp.value = t;
+    });
+    x.addEventListener('click', () => quitar(i));
+  }
+  const visibles = () => filas.filter((f) => !f.fila.hidden).length;
+
+  function pintar() {
+    const c = visibles(), m = AR.leer(monto.value, 'mon');
+    marca(monto, m !== null && !(m > 0 && m <= 1e12));
+    const t = textoCuotas({ cuotas: val.slice(0, c), monto: m, formato });
+    for (let k = 0; k < c; k++) { escribe(filas[k].out, t.filas[k]); marca(filas[k].inp, t.filas[k] === 'no válida'); }
+    escribe($('c-o-comb'), t.combinada); escribe($('c-o-pago'), t.pago); escribe($('c-o-neta'), t.neta);
+    escribe($('c-o-prob'), t.probabilidad); escribe($('c-v'), t.veredicto);
+  }
+  function botones() {
+    const c = visibles();
+    add.disabled = c >= filas.length;
+    for (const f of filas) f.x.disabled = c <= 1;
+  }
+  function quitar(k) {
+    const c = visibles();
+    if (c <= 1 || k >= c) return;
+    for (let j = k; j < c - 1; j++) { filas[j].inp.value = filas[j + 1].inp.value; val[j] = val[j + 1]; }
+    filas[c - 1].inp.value = ''; val[c - 1] = null; marca(filas[c - 1].inp, false);
+    filas[c - 1].fila.hidden = true;
+    botones(); pintar();
+    filas[Math.min(k, c - 2)].inp.focus();
+  }
+  add.addEventListener('click', () => {
+    const c = visibles();
+    if (c >= filas.length) return;
+    filas[c].fila.hidden = false;
+    botones(); pintar();
+    filas[c].inp.focus();
+  });
+  for (const r of radios) {
+    r.addEventListener('change', () => {
+      if (!r.checked) return;
+      formato = r.value === 'fra' || r.value === 'ame' ? r.value : 'dec';
+      filas.forEach((f, k) => {
+        if (val[k] > 1) f.inp.value = cuotaTexto(val[k], formato, true); // la cuota guardada no cambia, solo cómo se escribe
+        else val[k] = leerCuota(f.inp.value, formato);
+        f.inp.setAttribute('inputmode', formato === 'dec' ? 'decimal' : 'text');
+        f.inp.placeholder = EJEMPLO[formato];
+      });
+      pintar();
+    });
+  }
+  monto.addEventListener('input', pintar);
+  monto.addEventListener('blur', () => { const m = AR.leer(monto.value, 'mon'); if (m > 0 && m <= 1e12) monto.value = AR.monto(m); });
+  botones(); pintar();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!-- Calculadora de rollover. Pegá este bloque en el panel HTML. -->
+<main class="wrap">
+  <section class="calc" aria-labelledby="t-rollover">
+    <h1 id="t-rollover">Calculadora de rollover de un bono</h1>
+    <p class="sub">Cargá el depósito y los términos del bono para ver cuánto hay que apostar. El resultado se actualiza solo.</p>
+    <div class="campos">
+      <label class="f"><span>Depósito (ARS)</span><input type="text" id="r-dep" inputmode="numeric" autocomplete="off" value="20.000"></label>
+      <label class="f"><span>Bono (%)</span><input type="text" id="r-pct" inputmode="decimal" autocomplete="off" value="100"></label>
+      <label class="f"><span>Tope del bono (ARS, opcional)</span><input type="text" id="r-tope" inputmode="numeric" autocomplete="off" placeholder="sin tope"></label>
+      <label class="f"><span>Rollover (veces)</span><input type="text" id="r-roll" inputmode="decimal" autocomplete="off" value="35"></label>
+      <label class="f ancho"><span>Se calcula sobre</span>
+        <select id="r-base">
+          <option value="bono">Solo el bono</option>
+          <option value="suma">Depósito + bono</option>
+          <option value="deposito">Solo el depósito</option>
+        </select>
+      </label>
+      <label class="f"><span>Apuesta promedio (ARS, opcional)</span><input type="text" id="r-ap" inputmode="numeric" autocomplete="off" placeholder="por giro"></label>
+      <label class="f"><span>Plazo (días, opcional)</span><input type="text" id="r-dias" inputmode="decimal" autocomplete="off" placeholder="sin plazo"></label>
+    </div>
+    <div class="out" aria-live="polite">
+      <ul class="res">
+        <li><span>Bono acreditado</span><output id="r-o-bono"></output></li>
+        <li><span>Total a apostar</span><output id="r-o-total"></output></li>
+        <li><span>Giros a la apuesta promedio</span><output id="r-o-giros"></output></li>
+      </ul>
+      <p class="v" id="r-v"></p>
+    </div>
+    <p class="nota">+18 · Los términos de cada bono cambian. Leé los del operador antes de depositar.</p>
+  </section>
+  <footer>
+    <p>Hecho por <a href="https://girosargentina.com/" target="_blank" rel="noopener">Giros Argentina</a>. Guía y ejemplos en <a href="https://girosargentina.com/herramientas/calculadora-de-rollover/" target="_blank" rel="noopener">girosargentina.com/herramientas/calculadora-de-rollover/</a></p>
+    <p>Jugá solo si sos mayor de 18 años. Línea de ayuda 0800 de tu provincia en <a href="https://girosargentina.com/juego-responsable/" target="_blank" rel="noopener">girosargentina.com/juego-responsable/</a></p>
+  </footer>
+</main>

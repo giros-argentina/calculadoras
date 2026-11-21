@@ -1,0 +1,38 @@
+{
+  "name": "giros-calculadoras",
+  "version": "1.0.0",
+  "description": "Calculadoras de rollover de bonos, duración de saldo y cuotas combinadas. JavaScript sin dependencias, números en formato argentino.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./rollover": "./src/rollover.js",
+    "./saldo": "./src/saldo.js",
+    "./cuotas": "./src/cuotas.js",
+    "./numeros": "./src/numeros.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "rollover",
+    "bono",
+    "rtp",
+    "tragamonedas",
+    "cuotas",
+    "apuestas combinadas",
+    "calculadora",
+    "argentina"
+  ],
+  "author": "Giros Argentina (https://girosargentina.com/)",
+  "license": "MIT",
+  "homepage": "https://girosargentina.com/",
+  "engines": {
+    "node": ">=18"
+  }
+}
